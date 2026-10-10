@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#fff4e6" />
+<link rel="manifest" href="manifest.webmanifest" />
+<title>Father Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1d2430; --ink-soft: #5c6573; --cream: #fff4e6; --paper: #fffdf9;
+    --peach: #ff7a45; --peach-deep: #ef5d28; --sun: #ffc44d; --leaf: #2fbf86;
+    --sky: #6eb0ff; --lilac: #b9a0ff; --line: #f0e2d0;
+    --shadow: 0 10px 28px rgba(80, 48, 20, 0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: Nunito, ui-rounded, "Avenir Next", system-ui, sans-serif;
+    background: radial-gradient(900px 500px at 10% -10%, #ffe0bf, transparent 50%), radial-gradient(700px 400px at 110% 10%, #d7ecff, transparent 46%), #f6efe6;
+    color: var(--ink); display: flex; justify-content: center;
+  }
+  .stage { width: min(430px, 100%); min-height: 100%; background: var(--cream); position: relative; overflow: hidden; }
+  @media (min-width: 860px) {
+    body { align-items: center; padding: 24px; }
+    .stage { height: min(920px, calc(100vh - 48px)); min-height: 0; border-radius: 36px; box-shadow: 0 30px 80px rgba(60, 36, 12, 0.18); }
+  }
+  .screen { display: none; height: 100%; overflow: auto; padding: 22px 18px 32px; }
+  .screen.on { display: block; }
+  .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .mark { display: flex; align-items: center; gap: 10px; font-weight: 900; letter-spacing: -0.03em; font-size: 18px; }
+  .badge-dot { width: 36px; height: 36px; border-radius: 12px; background: var(--peach); color: white; display: grid; place-items: center; font-size: 18px; box-shadow: 0 6px 0 #d45520; }
+  .pill { background: white; border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 800; color: var(--ink-soft); border: 2px solid var(--line); }
+  .pill.warn { background: #fff1c4; color: #8a5a00; border-color: #efc56a; }
+  h1 { font-size: 32px; line-height: 0.95; margin: 6px 0 8px; letter-spacing: -0.04em; }
+  .lede { color: var(--ink-soft); font-weight: 700; margin: 0 0 16px; font-size: 15px; }
+  .kids, .stickers { display: flex; gap: 8px; overflow: auto; padding-bottom: 4px; }
+  .kid, .len, .choice button, .pass, .circ {
+    border: 2px solid var(--line); background: white; color: inherit; font: inherit; cursor: pointer;
+  }
+  .kid { border-radius: 18px; padding: 10px 12px; min-width: 108px; text-align: left; }
+  .kid.on { border-color: var(--peach); background: #fff1e8; box-shadow: 0 4px 0 #f0c2ae; }
+  .kid b { display: block; font-size: 15px; }
+  .kid span, .len span, .check span, .circ span { font-size: 12px; color: var(--ink-soft); font-weight: 800; }
+  .card { background: var(--paper); border-radius: 22px; padding: 16px; box-shadow: var(--shadow); border: 2px solid #fff; margin-top: 14px; }
+  .card h2 { margin: 0 0 4px; font-size: 18px; }
+  .check { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--line); }
+  .check:first-of-type { border-top: 0; }
+  .sticker, .stamp {
+    width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+    font-size: 18px; flex: none; font-weight: 900;
+  }
+  .stamp { width: 64px; height: 72px; border-radius: 16px; font-size: 22px; text-align: center; line-height: 1.05; padding-top: 8px; }
+  .stamp small { display: block; font-size: 10px; margin-top: 4px; }
+  .stamp.off { filter: grayscale(1); opacity: 0.4; }
+  .s-sun { background: #fff1c4; } .s-leaf { background: #d9f6ea; } .s-sky { background: #e3f1ff; } .s-lilac { background: #efe8ff; } .s-no { background: #ffe4dc; }
+  .check b { display: block; font-size: 14px; }
+  .btn { width: 100%; border: 0; border-radius: 18px; padding: 16px 18px; font: inherit; font-weight: 900; font-size: 17px; cursor: pointer; background: var(--peach); color: white; box-shadow: 0 6px 0 var(--peach-deep); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--peach-deep); }
+  .btn.ghost { background: white; color: var(--ink); box-shadow: 0 4px 0 var(--line); }
+  .btn.leaf { background: var(--leaf); box-shadow: 0 6px 0 #1e9a6a; }
+  .row { display: flex; gap: 8px; }
+  .row .btn { flex: 1; }
+  .lengths, .choice, .circuits { display: grid; gap: 10px; margin-top: 8px; }
+  .len, .circ { text-align: left; border-radius: 20px; padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .len b, .circ b { font-size: 18px; display: block; }
+  .back { border: 0; background: white; border-radius: 12px; font: inherit; font-weight: 800; padding: 8px 10px; cursor: pointer; }
+  .move-art { height: 190px; border-radius: 24px; display: grid; place-items: center; margin: 8px 0 12px; background: #fffdf9; }
+  .tag { display: inline-block; background: white; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 900; margin-bottom: 6px; }
+  .progress { height: 10px; background: #f3e4d4; border-radius: 99px; overflow: hidden; margin: 8px 0 12px; }
+  .progress > div { height: 100%; background: var(--peach); width: 0; }
+  .cue { font-size: 16px; font-weight: 800; line-height: 1.35; margin: 0 0 8px; }
+  .note { color: var(--ink-soft); font-weight: 700; font-size: 14px; margin: 0 0 14px; }
+  .lesson { background: #fff8dc; border: 2px dashed #efc56a; border-radius: 18px; padding: 12px; margin-bottom: 12px; }
+  .lesson b { display: block; margin-bottom: 4px; }
+  .choice button { text-align: left; border-radius: 16px; padding: 12px; font-weight: 800; }
+  .choice button.on, .pass.on { border-color: var(--sky); background: #eef6ff; }
+  .done-hero { text-align: center; padding-top: 12px; }
+  .medal { width: 108px; height: 108px; margin: 8px auto 10px; border-radius: 36px; background: var(--sun); display: grid; place-items: center; font-size: 52px; box-shadow: 0 8px 0 #e0a52a; transform: rotate(-6deg); }
+  .tiny { font-size: 12px; font-weight: 800; color: var(--ink-soft); }
+  svg { width: 200px; height: 110px; }
+  .field { display: grid; gap: 6px; margin-bottom: 10px; }
+  .plan { text-align: left; border-radius: 20px; padding: 14px; border: 2px solid var(--line); background: white; font: inherit; color: inherit; cursor: pointer; display: block; width: 100%; margin-bottom: 10px; }
+  .plan.on { border-color: var(--peach); background: #fff1e8; box-shadow: 0 4px 0 #f0c2ae; }
+  .plan b { display: block; font-size: 18px; }
+  .plan span { color: var(--ink-soft); font-weight: 800; font-size: 13px; }
+  .saveflag { float: right; background: var(--leaf); color: white; border-radius: 999px; padding: 3px 8px; font-size: 11px; }
+  .obar { margin: 4px 0 16px; }
+  .obar .track { height: 12px; background: #f3e4d4; border-radius: 99px; overflow: hidden; }
+  .obar .fill { height: 100%; width: 0; background: linear-gradient(90deg, #ffc44d, #ff7a45); border-radius: 99px; transition: width .35s ease; }
+  .obar .meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--ink-soft); margin-bottom: 6px; }
+  .ages { display: flex; gap: 8px; margin-bottom: 12px; }
+  .ages button { flex: 1; border: 2px solid var(--line); background: white; border-radius: 16px; padding: 12px 6px; font: inherit; font-weight: 900; cursor: pointer; }
+  .ages button.on { border-color: var(--peach); background: #fff1e8; }
+  .ages small { display: block; font-size: 11px; color: var(--ink-soft); }
+  .live { background: white; border-radius: 18px; padding: 12px; border: 2px dashed #f0c2ae; margin-bottom: 12px; font-weight: 800; }
+  .hookline { font-size: 28px; line-height: 1; letter-spacing: -0.04em; margin: 8px 0; }
+
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+  .week button { border: 2px solid var(--line); background: white; border-radius: 12px; padding: 6px 2px; font: inherit; font-weight: 800; font-size: 11px; cursor: pointer; }
+  .week button.on { border-color: var(--peach); background: #fff1e8; }
+  .week button small { display: block; color: var(--ink-soft); font-size: 9px; }
+  .manage { display: flex; gap: 8px; margin-top: 8px; }
+  .manage button { flex: 1; }
+
+  .move-art img { width: 100%; height: 100%; object-fit: contain; }
+  .arc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 8px; }
+  .arc i { height: 28px; border-radius: 8px; background: #f3e4d4; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 900; }
+  .arc i.on { background: #ff7a45; color: white; }
+  .arc i.done { background: #2fbf86; color: white; }
+  .linkish { background: none; border: 0; color: var(--ink-soft); font: inherit; font-weight: 800; width: 100%; padding: 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <section class="screen on" id="ob1">
+    <div class="obar"><div class="meta"><span>Step 1 of 4</span><span>The goal</span></div><div class="track"><div class="fill" style="width:25%"></div></div></div>
+    <div class="tag">A 40-pound lift, years from now</div>
+    <h1>Can you still pick them up?</h1>
+    <p class="hookline">Floor. Carry. Hold. Walk.</p>
+    <p class="lede">Most dads lose this in the years they stop training. Father Fitness is the 10-minute session you do with your kid so that day does not come.</p>
+    <div class="card">
+      <div class="check"><div class="sticker s-sun">↑</div><div><b>They do the move with you</b><span>6–9 copy. 10–13 learn why. 14–18 coach or lift.</span></div></div>
+      <div class="check"><div class="sticker s-leaf">▣</div><div><b>One checklist, once a month</b><span>Pass it and you are ready.</span></div></div>
+    </div>
+    <button class="btn" id="obNext1" style="margin-top:16px">I'm in. Who's with me?</button>
+  </section>
+
+  <section class="screen" id="ob2">
+    <div class="obar"><div class="meta"><span>Step 2 of 4</span><span>Their session</span></div><div class="track"><div class="fill" style="width:50%"></div></div></div>
+    <h1>Name the kid in the room.</h1>
+    <p class="lede">Tap an age. The app talks differently to a 7-year-old than a 16-year-old.</p>
+    <div class="field"><label class="tiny">THEIR NAME</label><input id="obName" maxlength="16" placeholder="First name" /></div>
+    <div class="ages" id="ageChips">
+      <button type="button" data-age="7">6–9<small>Do the move</small></button>
+      <button type="button" data-age="11">10–13<small>Lesson card</small></button>
+      <button type="button" data-age="16">14–18<small>Log or lift</small></button>
+    </div>
+    <div class="field"><label class="tiny">EXACT AGE</label><input id="obAge" type="number" min="6" max="18" placeholder="6–18" /></div>
+    <div class="live" id="obLive">Add a name. Their first session appears here.</div>
+    <button class="btn" id="obNext2">Lock their session</button>
+  </section>
+
+  <section class="screen" id="ob3">
+    <div class="obar"><div class="meta"><span>Step 3 of 4</span><span>The why</span></div><div class="track"><div class="fill" style="width:75%"></div></div></div>
+    <h1 id="ob3title">What are you training for?</h1>
+    <p class="lede" id="ob3lede">Pick one. It becomes the line on the home screen.</p>
+    <div class="choice" id="whyList">
+      <button data-why="grand">Someday a grandchild gets lifted</button>
+      <button data-why="now">Keep up with them this year</button>
+      <button data-why="both">Both. The kid now, the lift later.</button>
+    </div>
+    <div class="card" id="obPreview"></div>
+    <button class="btn" id="obNext3">Show me the plan</button>
+  </section>
+
+  <section class="screen" id="pay">
+    <div class="obar"><div class="meta"><span>Step 4 of 4</span><span>Your plan</span></div><div class="track"><div class="fill" style="width:100%"></div></div></div>
+    <div class="tiny">FREEMIUM · SAMPLE PRICES</div>
+    <h1 id="payTitle">Train together. Stay liftable.</h1>
+    <p class="lede" id="payLede">Annual is the one most families keep. Monthly if you want to try the month.</p>
+    <button class="plan on" id="planYear" data-plan="year"><span class="saveflag">Save 62%</span><b>$59.99 / year</b><span>$5.00 a month, billed yearly</span></button>
+    <button class="plan" id="planMonth" data-plan="month"><b>$12.99 / month</b><span>Cancel anytime. Same unlock.</span></button>
+    <button class="btn" id="payStart">Start annual</button>
+    <button class="linkish" id="payFree">Continue free · Carry circuit, 10 minutes, 1 kid</button>
+    <p class="tiny">Prototype only. No charge is made. Premium unlocks every circuit, 20 and 30 minute sessions, every kid, and the monthly retest.</p>
+  </section>
+
+  <section class="screen" id="home">
+    <div class="top">
+      <div class="mark"><div class="badge-dot">Ff</div> Father Fitness</div>
+      <div class="pill" id="homePill">0 play days</div>
+    </div>
+    <h1>Still able to pick them up.</h1>
+    <p class="lede">Train with your kid now, so a grandchild still gets lifted later. Streak: play days on this phone.</p>
+    <div class="tiny" style="margin-bottom:8px">KID PROFILES</div>
+    <div class="kids" id="kidRow"></div>
+    <button class="btn" id="startBtn" style="margin-top:16px">Pick a circuit</button>
+    <button class="btn ghost" id="addKid" style="margin-top:10px">Add a kid</button>
+    <button class="btn ghost" id="upgradeBtn" style="margin-top:10px">Upgrade</button>
+
+    <div class="card" id="weekCard"></div>
+    <div class="card" id="arcCard"></div>
+    <div class="manage">
+      <button class="btn ghost" id="editKid">Edit kid</button>
+      <button class="btn ghost" id="removeKid">Remove</button>
+    </div>
+    <button class="btn ghost" id="accountBtn" style="margin-top:10px">Account and reminder</button>
+    <div class="card" id="stickerCard"></div>
+    <div class="card" id="readyCard"></div>
+    <div class="card" id="histCard"></div>
+  </section>
+
+  <section class="screen" id="add">
+    <button class="back" id="backAdd">← Home</button>
+    <h1>New kid profile</h1>
+    <p class="lede">Age sets the session. 6–9 do the move. 10–13 get a lesson. 14–18 log you or lift.</p>
+    <div class="field"><label class="tiny">NAME</label><input id="kidName" maxlength="16" placeholder="Name" /></div>
+    <div class="field"><label class="tiny">AGE</label><input id="kidAge" type="number" min="6" max="18" placeholder="6–18" /></div>
+    <button class="btn" id="saveKid">Save profile</button>
+  </section>
+
+  <section class="screen" id="circuits">
+    <button class="back" id="backCirc">← Home</button>
+    <h1 id="circTitle">Which circuit?</h1>
+    <p class="lede">Built-in only. Same length choices after you pick.</p>
+    <div class="circuits" id="circList"></div>
+  </section>
+
+  <section class="screen" id="length">
+    <button class="back" id="backLen">← Circuits</button>
+    <h1 id="lenTitle">How long today?</h1>
+    <p class="lede" id="lenLede">The clock changes the work, not the point.</p>
+    <div class="lengths">
+      <button class="len" data-min="10"><div><b>10 minutes</b><span>1 pass · after school</span></div><span>Short</span></button>
+      <button class="len" data-min="20"><div><b>20 minutes</b><span>2 passes · the default</span></div><span>Solid</span></button>
+      <button class="len" data-min="30"><div><b>30 minutes</b><span>2 passes + a slow finish</span></div><span>Full</span></button>
+    </div>
+  </section>
+
+  <section class="screen" id="session">
+    <div class="top">
+      <button class="back" id="quit">End</button>
+      <button class="back" id="pauseBtn">Pause</button>
+      <div class="pill" id="clockPill">20:00</div>
+    </div>
+    <div class="tag" id="moveTag">Move 1 of 4</div>
+    <h1 id="moveName" style="font-size:28px">Floor get-up</h1>
+    <div class="progress"><div id="bar"></div></div>
+    <div class="move-art" id="art"></div>
+    <p class="cue" id="cue"></p>
+    <p class="note" id="note"></p>
+    <div class="lesson" id="lesson" hidden></div>
+    <div class="choice" id="choice" hidden></div>
+    <div class="row">
+      <button class="btn ghost" id="skip">Skip</button>
+      <button class="btn" id="next">Done, next</button>
+    </div>
+  </section>
+
+  <section class="screen" id="rest">
+    <div class="top">
+      <button class="back" id="quitRest">End</button>
+      <div class="pill" id="restClock">00:20</div>
+    </div>
+    <div class="tag" id="restTag">Rest</div>
+    <h1 id="restTitle">Shake it out.</h1>
+    <p class="lede" id="restLede">Twenty seconds. Next move is ready when you are.</p>
+    <button class="btn" id="restSkip">Skip rest</button>
+  </section>
+
+  <section class="screen" id="test">
+    <button class="back" id="quitTest">← Home</button>
+    <div class="tag" id="testTag">Test 1 of 4</div>
+    <h1 id="testName">Floor-to-stand</h1>
+    <div class="progress"><div id="testBar"></div></div>
+    <p class="cue" id="testCue"></p>
+    <p class="note" id="testStd"></p>
+    <div class="field"><label class="tiny" id="n1label">NUMBER</label><input id="n1" type="number" min="0" /></div>
+    <div class="field"><label class="tiny" id="n2label">NUMBER</label><input id="n2" type="number" min="0" /></div>
+    <div class="choice" id="testChoice"></div>
+    <button class="btn" id="testNext">Save and next</button>
+  </section>
+
+
+  <section class="screen" id="account">
+    <button class="back" id="backAccount">← Home</button>
+    <h1>This phone, and the next one.</h1>
+    <p class="lede">No server yet. Export a file, import it on the other phone, and the streak comes with you. Reminder is a local evening ping.</p>
+    <div class="field"><label class="tiny">EMAIL ON THIS ACCOUNT</label><input id="acctEmail" type="email" placeholder="you@email.com" /></div>
+    <div class="field"><label class="tiny">REMINDER EVENING</label><input id="acctTime" type="time" value="18:00" /></div>
+    <button class="btn" id="saveAccount">Save account</button>
+    <button class="btn ghost" id="testRemind" style="margin-top:10px">Send a test reminder</button>
+    <button class="btn ghost" id="exportBtn" style="margin-top:10px">Export restore file</button>
+    <div class="field" style="margin-top:12px"><label class="tiny">IMPORT ON THE OTHER PHONE</label><input id="importFile" type="file" accept="application/json" /></div>
+    <button class="btn ghost" id="managePlan">Manage subscription</button>
+    <p class="tiny" id="acctNote">Prototype. No charge is made. The restore file is the account until sign-in exists.</p>
+  </section>
+  <section class="screen" id="done">
+    <div class="done-hero">
+      <div class="medal" id="medal">★</div>
+      <div class="tag" id="doneTag">Sticker earned</div>
+      <h1 id="doneTitle">Carried it.</h1>
+      <p class="lede" id="doneLede"></p>
+    </div>
+    <div class="card" id="doneCard"></div>
+    <button class="btn leaf" id="again" style="margin-top:14px">Back home</button>
+  </section>
+</div>
+<script>
+const KEY = "father-fitness-v7";
+const seedKids = [
+  { id: "milo", name: "Milo", age: 7 },
+  { id: "june", name: "June", age: 11 },
+  { id: "sam", name: "Sam", age: 16 }
+];
+function move(name, tint, art, dad, young, mid, teen, lesson, reps) {
+  return { name, tint, art, dad, young, mid, teen, lesson, reps };
+}
+const circuits = [
+  {
+    id: "carry", name: "Grandkid Carry", blurb: "The pickup itself. Stand, carry, hold, lift.",
+    moves: [
+      move("Floor get-up", "#ffe7c2", "getup", "Sit, then stand. One hand only if you need it.", "Pop up like a meerkat.", "Same get-up, then the lesson.", "Count Dad's stands, or do your own set.", "Getting off the floor is the test that fails first. A grandchild pickup starts here.", { 10: "6 stands", 20: "8 stands × 2", 30: "8 stands × 2" }),
+      move("Farmer carry", "#d9f6ea", "carry", "Heavy bags at your sides. Walk tall.", "Two water bottles. No race.", "A backpack, then the why.", "Log Dad's steps, or carry your own load.", "Grip and trunk keep a child from slipping. Carry something awkward, not just heavy.", { 10: "20 steps", 20: "30 steps × 2", 30: "40 steps × 2" }),
+      move("Overhead hold", "#e3f1ff", "overhead", "Arms locked up. Breathe. Don't shrug it out.", "Hold a ball overhead and count to 8.", "Hold, then name the shoulders' job.", "Time Dad's hold, or hold your own.", "Overhead is the moment you have them. Shoulders quit first if you never practice the hold.", { 10: "15 sec", 20: "20 sec × 2", 30: "25 sec × 2" }),
+      move("Pick-up squat", "#efe8ff", "squat", "Squat, grab, stand. That is the grandchild lift.", "Lift a stuffed bag. High-five at the top.", "Lift, then say what the legs did.", "Coach the lift, or run your scaled set.", "The pickup is a squat plus a carry. Practice the hinge, not a fast snatch.", { 10: "6 lifts", 20: "8 lifts × 2", 30: "8 lifts × 2" })
+    ]
+  },
+  {
+    id: "floor", name: "Floor Strong", blurb: "Get down and get up. The skill that leaves first.",
+    moves: [
+      move("Cross-leg stand", "#ffe7c2", "getup", "Sit cross-leg, stand without a push if you can.", "Roll to knees, then stand.", "Stand, then say why floors matter.", "Count clean stands, or match the set.", "A picnic, a living room, a grandchild on the rug. You have to get up.", { 10: "5 stands", 20: "6 stands × 2", 30: "8 stands × 2" }),
+      move("Bear crawl", "#d9f6ea", "crawl", "Hands and feet, hips low, short trip.", "Animal crawl to the couch and back.", "Crawl, then name what the shoulders did.", "Time the trip, or crawl your own.", "Crawling keeps wrists, shoulders, and hips in the job of playing on the floor.", { 10: "1 trip", 20: "2 trips", 30: "3 trips" }),
+      move("Hip hinge", "#e3f1ff", "hinge", "Soft knees, push hips back, flat back.", "Touch toes on a chair, stand tall.", "Hinge, then the lesson.", "Watch Dad's back, or hinge with a light bag.", "Most pickups are a hinge, not a squat. The back stays long.", { 10: "8 hinges", 20: "8 hinges × 2", 30: "10 hinges × 2" }),
+      move("Rest-and-rise", "#efe8ff", "getup", "Lie back, rest 10 seconds, stand up smooth.", "Lie like a starfish, then pop up.", "Rise, then say what got tired.", "Count the rises, or do them with Dad.", "Grandkids live on the floor. Practice leaving it.", { 10: "4 rises", 20: "5 rises × 2", 30: "6 rises × 2" })
+    ]
+  },
+  {
+    id: "yard", name: "Backyard Games", blurb: "Partner play that still trains the carry.",
+    moves: [
+      move("Shadow steps", "#ffe7c2", "walk", "Kid leads a walk. Match their pace.", "Pick the path. Dad follows.", "Lead, then say what pace does.", "Call the turns, or follow a harder pace.", "You will chase a small person. Practice their pace, not yours.", { 10: "1 minute", 20: "2 minutes", 30: "3 minutes" }),
+      move("High-five plank", "#d9f6ea", "plank", "Plank. Kid high-fives each hand.", "Crawl under Dad's plank once.", "High-five, then name the job.", "Count the fives, or hold your own plank.", "A carry starts with a trunk that does not fold.", { 10: "4 fives", 20: "6 fives × 2", 30: "8 fives × 2" }),
+      move("Suitcase walk", "#e3f1ff", "carry", "One heavy bag, one side, then switch.", "One water bottle, switch hands.", "Switch, then the why.", "Time each side, or carry your own.", "Kids are rarely centered. One-side carries are the real job.", { 10: "15 steps a side", 20: "20 steps a side", 30: "30 steps a side" }),
+      move("Finish lap", "#efe8ff", "walk", "Walk and talk. Still tall.", "Lap the yard together.", "Lap, then one thing you noticed.", "Keep the time, or set the pace.", "The last minute is when grips fail. Practice the end, not the start.", { 10: "1 lap", 20: "2 laps", 30: "3 laps" })
+    ]
+  }
+];
+const tests = [
+  { id: "floor", name: "Floor-to-stand", cue: "Sit on the floor. Stand up. Both hands is a miss.", std: "Pass: up in one smooth try, one hand or none.", sticker: "s-sun" },
+  { id: "carry", name: "Farmer carry", cue: "Carry something heavy at your sides for 30 steps. Stay tall.", std: "Pass: 30 steps, no put-down, no lean.", sticker: "s-leaf" },
+  { id: "overhead", name: "Overhead hold", cue: "Lock a light load overhead for 20 seconds.", std: "Pass: 20 seconds, no shrug-out, no step.", sticker: "s-sky" },
+  { id: "walk", name: "Short walk", cue: "Walk 1 minute still carrying. Talk while you walk.", std: "Pass: the full minute, still holding, still talking.", sticker: "s-lilac" }
+];
+const stickerBook = [
+  { id: "first", name: "First session", icon: "★" },
+  { id: "carry", name: "Carry", icon: "▣" },
+  { id: "floor", name: "Floor", icon: "↑" },
+  { id: "yard", name: "Yard", icon: "→" },
+  { id: "long", name: "30 min", icon: "30" },
+  { id: "ready", name: "Ready", icon: "✓" }
+];
+
+let db = load();
+let state = { kidId: db.kids[0].id, circuit: "carry", min: 20, i: 0, teenMode: "coach", marks: [], left: 0, paused: false, rest: 0 };
+let timer = null;
+let restTimer = null;
+
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+  return { kids: seedKids, sessions: [], checks: [], plan: "free", onboarded: false, why: "both", offer: "year", email: "", remind: "18:00", editing: null };
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(db)); }
+function kid() { return db.kids.find(k => k.id === state.kidId) || db.kids[0]; }
+function circuit() { return circuits.find(c => c.id === state.circuit); }
+function band(age) { return age <= 9 ? "young" : age <= 13 ? "mid" : "teen"; }
+function label(age) { const b = band(age); return b === "young" ? "does the move" : b === "mid" ? "move + lesson" : "logs or lifts"; }
+function $(id) { return document.getElementById(id); }
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("on"));
+  $(id).classList.add("on");
+  $(id).scrollTop = 0;
+}
+function latestCheck() { return db.checks.filter(c => c.kidId === state.kidId).slice(-1)[0]; }
+function earned() {
+  const mine = db.sessions.filter(s => s.kidId === state.kidId);
+  const ready = db.checks.some(c => c.kidId === state.kidId && c.marks.filter(Boolean).length === 4);
+  return {
+    first: mine.length > 0,
+    carry: mine.some(s => s.circuit === "carry"),
+    floor: mine.some(s => s.circuit === "floor"),
+    yard: mine.some(s => s.circuit === "yard"),
+    long: mine.some(s => s.min === 30),
+    ready
+  };
+}
+function stamp() { return new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
+function clock(sec) {
+  const m = Math.floor(Math.max(0, sec) / 60);
+  const s = Math.max(0, sec) % 60;
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+function stopTimer() { if (timer) clearInterval(timer); timer = null; }
+function stopRest() { if (restTimer) clearInterval(restTimer); restTimer = null; }
+function startTimer() {
+  stopTimer();
+  state.paused = false;
+  state.left = state.min * 60;
+  $("pauseBtn").textContent = "Pause";
+  paintClock();
+  timer = setInterval(() => {
+    if (state.paused) return;
+    state.left -= 1;
+    paintClock();
+    if (state.left <= 0) stopTimer();
+  }, 1000);
+}
+function paintClock() {
+  const el = $("clockPill");
+  el.textContent = state.paused ? "Paused" : clock(state.left);
+  el.classList.toggle("warn", state.left <= 0 || state.paused);
+}
+function streak() {
+  const days = [...new Set(db.sessions.map(s => s.when))];
+  return days.length;
+}
+function premium() { return db.plan === "month" || db.plan === "year"; }
+function planLabel() { return db.plan === "year" ? "Annual" : db.plan === "month" ? "Monthly" : "Free"; }
+function openPay(reason) {
+  const name = db.kidName || "your kid";
+  $("payTitle").textContent = reason || "Train together. Stay liftable.";
+  $("payLede").textContent = "Built for " + name + ". Annual is the one most families keep.";
+  show("pay");
+}
+
+function art(kind) {
+  const s = `stroke="#1d2430" stroke-width="3" fill="none" stroke-linecap="round"`;
+  const fig = (x, y, up) => {
+    const arms = up
+      ? `<path d="M${x} ${y-28} L${x-16} ${y-52} M${x} ${y-28} L${x+16} ${y-52}" ${s}/>`
+      : `<path d="M${x} ${y-24} L${x-22} ${y-6} M${x} ${y-24} L${x+22} ${y-6}" ${s}/>`;
+    return `<circle cx="${x}" cy="${y-46}" r="12" fill="#ffd7b0" stroke="#1d2430" stroke-width="3"/>${arms}<path d="M${x} ${y-34} v28 M${x} ${y-6} l-16 24 M${x} ${y-6} l16 24" ${s}/>`;
+  };
+  if (kind === "carry") return `<svg viewBox="0 0 220 140">${fig(78,70)}<rect x="40" y="78" width="18" height="26" rx="4" fill="#2fbf86" stroke="#1d2430" stroke-width="3"/><rect x="118" y="78" width="18" height="26" rx="4" fill="#ff7a45" stroke="#1d2430" stroke-width="3"/></svg>`;
+  if (kind === "overhead") return `<svg viewBox="0 0 220 140">${fig(90,84,true)}<circle cx="110" cy="28" r="12" fill="#6eb0ff" stroke="#1d2430" stroke-width="3"/></svg>`;
+  if (kind === "squat") return `<svg viewBox="0 0 220 140">${fig(86,96)}<rect x="132" y="100" width="28" height="18" rx="5" fill="#b9a0ff" stroke="#1d2430" stroke-width="3"/></svg>`;
+  if (kind === "crawl") return `<svg viewBox="0 0 220 140"><circle cx="78" cy="70" r="11" fill="#ffd7b0" stroke="#1d2430" stroke-width="3"/><path d="M78 80 H130 M90 80 l-8 24 M118 80 l10 24 M90 80 l-6 -8 M120 80 l8 -6" ${s}/></svg>`;
+  if (kind === "hinge") return `<svg viewBox="0 0 220 140"><circle cx="108" cy="48" r="11" fill="#ffd7b0" stroke="#1d2430" stroke-width="3"/><path d="M108 60 l22 28 l-8 30 M130 88 l-28 8" ${s}/></svg>`;
+  if (kind === "plank") return `<svg viewBox="0 0 220 140"><circle cx="64" cy="62" r="11" fill="#ffd7b0" stroke="#1d2430" stroke-width="3"/><path d="M74 70 H150 M150 70 l16 18 M90 70 v22" ${s}/><circle cx="150" cy="52" r="7" fill="#ffc44d" stroke="#1d2430" stroke-width="3"/></svg>`;
+  if (kind === "walk") return `<svg viewBox="0 0 220 140">${fig(70,78)}${fig(130,78)}<path d="M36 116h150" ${s}/></svg>`;
+  return `<svg viewBox="0 0 220 140">${fig(70,78)}<path d="M40 112h150" ${s}/></svg>`;
+}
+
+function renderHome() {
+  const k = kid();
+  $("homePill").textContent = planLabel() + " · " + streak() + " day" + (streak() === 1 ? "" : "s");
+  $("upgradeBtn").style.display = premium() ? "none" : "block";
+  $("kidRow").innerHTML = db.kids.map(item => `
+    <button class="kid ${item.id === k.id ? "on" : ""}" data-id="${item.id}">
+      <b>${item.name}</b><span>Age ${item.age} · ${label(item.age)}</span>
+    </button>`).join("");
+  $("kidRow").querySelectorAll(".kid").forEach(btn => btn.onclick = () => { state.kidId = btn.dataset.id; renderHome(); });
+  const got = earned();
+  $("stickerCard").innerHTML = `
+    <div class="tiny">STICKER BOOK</div>
+    <h2>${k.name}</h2>
+    <div class="stickers" style="margin-top:10px">${stickerBook.map(s => `<div class="stamp s-sun ${got[s.id] ? "" : "off"}">${s.icon}<small>${s.name}</small></div>`).join("")}</div>`;
+  const check = latestCheck();
+  const passed = check ? check.marks.filter(Boolean).length : 0;
+  const status = !check ? "Not tested" : passed === 4 ? "Ready" : passed + " of 4";
+  $("readyCard").innerHTML = `
+    <div class="tiny">MONTHLY RETEST · ${status.toUpperCase()}</div>
+    <h2>Grandkid readiness</h2>
+    <p class="note" style="margin-top:4px">${check ? "Last test " + check.when + "." : "Four tests. Pass them and you are ready."}</p>
+    ${tests.map((t, i) => {
+      const ok = check ? check.marks[i] : null;
+      const mark = ok === true ? "Pass" : ok === false ? "Not yet" : "Not logged";
+      return `<div class="check"><div class="sticker ${ok === false ? "s-no" : t.sticker}">${ok === true ? "✓" : ok === false ? "–" : "·"}</div><div><b>${t.name}</b><span>${mark}</span></div></div>`;
+    }).join("")}
+    <button class="btn" id="openTest" style="margin-top:12px">${check ? "Retest this month" : "Run the checklist"}</button>`;
+  $("openTest").onclick = startTest;
+  const mine = db.sessions.filter(s => s.kidId === k.id).slice(-4).reverse();
+  $("histCard").innerHTML = `
+    <div class="tiny">SESSION HISTORY</div>
+    <h2>${k.name}</h2>
+    ${mine.length ? mine.map(s => `<div class="check"><div class="sticker s-sun">${s.min}</div><div><b>${s.name}</b><span>${s.when} · ${s.mode}</span></div></div>`).join("") : `<p class="note" style="margin-top:8px">No sessions yet. Finish one and it stays on this phone.</p>`}`;
+}
+
+function renderCircuits() {
+  $("circTitle").textContent = kid().name + " is in. Which circuit?";
+  $("circList").innerHTML = circuits.map(c => `<button class="circ" data-id="${c.id}"><div><b>${c.name}</b><span>${c.blurb}</span></div><span>4 moves</span></button>`).join("");
+  $("circList").querySelectorAll(".circ").forEach(btn => btn.onclick = () => {
+    if (!premium() && btn.dataset.id !== "carry") return openPay("Floor Strong and Backyard Games are Premium.");
+    state.circuit = btn.dataset.id;
+    $("lenTitle").textContent = circuit().name;
+    $("lenLede").textContent = premium() ? "10, 20, or 30. The clock starts when the first move opens." : "Free is 10 minutes. 20 and 30 are Premium.";
+    show("length");
+  });
+}
+function startSession() {
+  state.i = 0;
+  state.teenMode = "coach";
+  startTimer();
+  renderMove();
+  show("session");
+}
+function renderMove() {
+  const c = circuit();
+  const m = c.moves[state.i];
+  const k = kid();
+  const b = band(k.age);
+  $("moveTag").textContent = `${c.name} · move ${state.i + 1} of 4`;
+  $("moveName").textContent = m.name;
+  $("bar").style.width = `${(state.i / 4) * 100}%`;
+  $("art").style.background = m.tint;
+  $("art").innerHTML = art(m.art);
+  $("cue").textContent = "Dad: " + m.dad;
+  $("note").textContent = `${k.name}, ${k.age}: ${m[b]} · ${m.reps[state.min]}`;
+  $("lesson").hidden = b !== "mid";
+  if (b === "mid") $("lesson").innerHTML = `<b>20-second lesson</b>${m.lesson}`;
+  const choice = $("choice");
+  if (b === "teen") {
+    choice.hidden = false;
+    choice.innerHTML = `
+      <button data-mode="coach" class="${state.teenMode === "coach" ? "on" : ""}">Log Dad · count and check the cue</button>
+      <button data-mode="own" class="${state.teenMode === "own" ? "on" : ""}">Own set · same move, your load</button>`;
+    choice.querySelectorAll("button").forEach(btn => btn.onclick = () => { state.teenMode = btn.dataset.mode; renderMove(); });
+  } else choice.hidden = true;
+  $("next").textContent = state.i === 3 ? "Finish session" : "Done, next";
+}
+function beginRest() {
+  stopRest();
+  const next = circuit().moves[state.i + 1];
+  state.rest = 20;
+  $("restTag").textContent = "Rest · next up";
+  $("restTitle").textContent = next.name;
+  $("restLede").textContent = "Twenty seconds. The session clock keeps running.";
+  $("restClock").textContent = "00:20";
+  show("rest");
+  restTimer = setInterval(() => {
+    state.rest -= 1;
+    $("restClock").textContent = clock(state.rest);
+    if (state.rest <= 0) finishRest();
+  }, 1000);
+}
+function finishRest() {
+  stopRest();
+  state.i += 1;
+  renderMove();
+  show("session");
+}
+function advance() {
+  const c = circuit();
+  if (state.i < 3) { beginRest(); return; }
+  stopTimer();
+  stopRest();
+  const k = kid();
+  const b = band(k.age);
+  const mode = b === "teen" ? (state.teenMode === "coach" ? "logged Dad" : "own set") : b === "mid" ? "lesson cards" : "kid moves";
+  const before = earned();
+  db.sessions.push({ kidId: k.id, circuit: c.id, name: c.name, min: state.min, mode, when: stamp() });
+  save();
+  const after = earned();
+  const fresh = stickerBook.filter(s => after[s.id] && !before[s.id]);
+  $("medal").textContent = "★";
+  $("doneTitle").textContent = "Session in.";
+  $("doneTag").textContent = fresh.length ? fresh.map(s => s.name).join(" · ") : state.min + "-min sticker";
+  $("doneLede").textContent = `${k.name} finished ${c.name}. ${mode}. Clock ${clock(state.left)} left.`;
+  $("doneCard").innerHTML = c.moves.map((m, i) => `<div class="check"><div class="sticker s-sun">${i + 1}</div><div><b>${m.name}</b><span>${m.reps[state.min]}</span></div></div>`).join("");
+  show("done");
+}
+
+function startTest() {
+  if (!premium()) return openPay("The monthly retest is Premium.");
+  state.i = 0;
+  state.marks = [null, null, null, null];
+  renderTest();
+  show("test");
+}
+function renderTest() {
+  const t = tests[state.i];
+  $("testTag").textContent = `Test ${state.i + 1} of 4`;
+  $("testName").textContent = t.name;
+  $("testBar").style.width = `${(state.i / 4) * 100}%`;
+  $("testCue").textContent = t.cue;
+  $("testStd").textContent = t.std;
+  $("testChoice").innerHTML = `
+    <button class="pass ${state.marks[state.i] === true ? "on" : ""}" data-ok="1">Pass</button>
+    <button class="pass ${state.marks[state.i] === false ? "on" : ""}" data-ok="0">Not yet</button>`;
+  $("testChoice").querySelectorAll("button").forEach(btn => btn.onclick = () => { state.marks[state.i] = btn.dataset.ok === "1"; renderTest(); });
+  $("testNext").textContent = state.i === 3 ? "Save checklist" : "Save and next";
+}
+function advanceTest() {
+  if (state.marks[state.i] === null) state.marks[state.i] = false;
+  if (state.i < 3) { state.i++; renderTest(); return; }
+  const before = earned();
+  const passed = state.marks.filter(Boolean).length;
+  db.checks.push({ kidId: state.kidId, marks: state.marks, when: stamp() });
+  save();
+  const fresh = !before.ready && passed === 4;
+  $("medal").textContent = passed === 4 ? "✓" : "–";
+  $("doneTitle").textContent = passed === 4 ? "Ready." : "Not yet.";
+  $("doneTag").textContent = fresh ? "Ready sticker" : passed + " of 4";
+  $("doneLede").textContent = passed === 4 ? "You can still pick them up. Retest next month." : "The misses are the next month of work.";
+  $("doneCard").innerHTML = tests.map((t, i) => `<div class="check"><div class="sticker ${state.marks[i] ? t.sticker : "s-no"}">${state.marks[i] ? "✓" : "–"}</div><div><b>${t.name}</b><span>${state.marks[i] ? "Pass" : "Not yet"}</span></div></div>`).join("");
+  show("done");
+}
+
+$("startBtn").onclick = () => { renderCircuits(); show("circuits"); };
+$("upgradeBtn").onclick = () => openPay("Unlock the full session.");
+$("addKid").onclick = () => {
+  if (!premium() && db.kids.length >= 1) return openPay("More than one kid is Premium.");
+  show("add");
+};
+function paintLive() {
+  const name = $("obName").value.trim() || "They";
+  const age = Number($("obAge").value);
+  const mode = !age ? "pick an age" : age <= 9 ? "do the move with you" : age <= 13 ? "get a 20-second lesson after each move" : "log you or run their own set";
+  $("obLive").textContent = age ? name + ", " + age + ", will " + mode + "." : "Add a name and an age. Their first session appears here.";
+}
+$("obName").addEventListener("input", paintLive);
+$("obAge").addEventListener("input", paintLive);
+document.querySelectorAll("#ageChips button").forEach(btn => btn.onclick = () => {
+  $("obAge").value = btn.dataset.age;
+  document.querySelectorAll("#ageChips button").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  paintLive();
+});
+$("obNext1").onclick = () => show("ob2");
+$("obNext2").onclick = () => {
+  const name = $("obName").value.trim();
+  const age = Number($("obAge").value);
+  if (!name || age < 6 || age > 18) { $("obLive").textContent = "Need a name and an age from 6 to 18."; return; }
+  db.kidName = name;
+  db.kids = [{ id: "obkid", name, age }];
+  state.kidId = "obkid";
+  save();
+  $("ob3title").textContent = "What is " + name + " training you for?";
+  $("ob3lede").textContent = name + " is " + age + ". " + (age <= 9 ? "They copy the move." : age <= 13 ? "They get the lesson card." : "They can log you or lift.");
+  $("obPreview").innerHTML = "<div class='tiny'>FIRST SESSION</div><h2>Grandkid Carry · 10 min</h2><p class='note' style='margin:6px 0 0'>Floor get-up, farmer carry, overhead hold, pick-up squat. With " + name + ".</p>";
+  show("ob3");
+};
+document.querySelectorAll("#whyList button").forEach(btn => btn.onclick = () => {
+  db.why = btn.dataset.why;
+  document.querySelectorAll("#whyList button").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+});
+$("obNext3").onclick = () => openPay("Stay strong enough to pick them up.");
+function choosePlan(plan) {
+  db.offer = plan;
+  $("planYear").classList.toggle("on", plan === "year");
+  $("planMonth").classList.toggle("on", plan === "month");
+  $("payStart").textContent = plan === "year" ? "Start annual" : "Start monthly";
+}
+$("planYear").onclick = () => choosePlan("year");
+$("planMonth").onclick = () => choosePlan("month");
+$("payStart").onclick = () => {
+  db.plan = db.offer || "year";
+  db.onboarded = true;
+  save();
+  renderHome();
+  show("home");
+};
+$("payFree").onclick = () => {
+  db.plan = "free";
+  db.onboarded = true;
+  save();
+  renderHome();
+  show("home");
+};
+$("backAdd").onclick = () => show("home");
+$("backCirc").onclick = () => show("home");
+$("backLen").onclick = () => show("circuits");
+$("saveKid").onclick = () => {
+  const name = $("kidName").value.trim();
+  const age = Number($("kidAge").value);
+  if (!name || age < 6 || age > 18) return;
+  const id = name.toLowerCase().replace(/\s+/g, "") + age + Date.now().toString().slice(-4);
+  db.kids.push({ id, name, age });
+  state.kidId = id;
+  save();
+  $("kidName").value = "";
+  $("kidAge").value = "";
+  renderHome();
+  show("home");
+};
+document.querySelectorAll(".len").forEach(btn => btn.onclick = () => {
+  const min = Number(btn.dataset.min);
+  if (!premium() && min > 10) return openPay("20 and 30 minute sessions are Premium.");
+  state.min = min;
+  startSession();
+});
+$("quit").onclick = () => { stopTimer(); stopRest(); show("home"); };
+$("quitTest").onclick = () => show("home");
+$("quitRest").onclick = () => { stopTimer(); stopRest(); show("home"); };
+$("pauseBtn").onclick = () => {
+  state.paused = !state.paused;
+  $("pauseBtn").textContent = state.paused ? "Resume" : "Pause";
+  paintClock();
+};
+$("restSkip").onclick = finishRest;
+$("skip").onclick = advance;
+$("next").onclick = advance;
+$("testNext").onclick = advanceTest;
+$("again").onclick = () => { renderHome(); show("home"); };
+
+const WEEK = [
+  { id: "check", name: "Retest", min: 0 },
+  { id: null, name: "Rest", min: 0 },
+  { id: "carry", name: "Grandkid Carry", min: 10 },
+  { id: null, name: "Rest", min: 0 },
+  { id: "floor", name: "Floor Strong", min: 20 },
+  { id: null, name: "Rest", min: 0 },
+  { id: "yard", name: "Backyard Games", min: 20 }
+];
+const TEST_FIELDS = [
+  { a: "Seconds to stand", b: "Hands used", pass: (a, b) => a <= 5 && b <= 1, hint: "Pass: 5 seconds or less, one hand or none." },
+  { a: "Pounds carried", b: "Steps", pass: (a, b) => b >= 30 && a > 0, hint: "Pass: 30 steps, still holding a real load." },
+  { a: "Pounds overhead", b: "Seconds held", pass: (a, b) => b >= 20 && a > 0, hint: "Pass: 20 seconds, a real load, no step." },
+  { a: "Minutes walked", b: "Still talking (1 yes)", pass: (a, b) => a >= 1 && b >= 1, hint: "Pass: 1 minute, still carrying, still talking." }
+];
+function person(x, y, scale, shirt, up, hinge) {
+  const s = `stroke="#1d2430" stroke-width="3" fill="none" stroke-linecap="round"`;
+  const head = y - 46 * scale;
+  let arms = up
+    ? `<path d="M${x} ${y-28*scale} L${x-18*scale} ${y-54*scale} M${x} ${y-28*scale} L${x+18*scale} ${y-54*scale}" ${s}/>`
+    : `<path d="M${x} ${y-22*scale} L${x-24*scale} ${y-4*scale} M${x} ${y-22*scale} L${x+24*scale} ${y-4*scale}" ${s}/>`;
+  let body = `<path d="M${x} ${y-34*scale} v${30*scale}" ${s}/>`;
+  let legs = `<path d="M${x} ${y-4*scale} l${-16*scale} ${26*scale} M${x} ${y-4*scale} l${16*scale} ${26*scale}" ${s}/>`;
+  if (hinge) {
+    body = `<path d="M${x} ${y-20*scale} l${26*scale} ${18*scale}" ${s}/>`;
+    legs = `<path d="M${x+26*scale} ${y-2*scale} l${-8*scale} ${24*scale}" ${s}/>`;
+    arms = `<path d="M${x+20*scale} ${y-8*scale} l${-30*scale} ${8*scale}" ${s}/>`;
+  }
+  return `<g><circle cx="${x}" cy="${head}" r="${12*scale}" fill="#ffd7b0" stroke="#1d2430" stroke-width="3"/>${arms}${body}<rect x="${x-10*scale}" y="${y-32*scale}" width="${20*scale}" height="${16*scale}" rx="4" fill="${shirt}" stroke="#1d2430" stroke-width="2"/>${legs}</g>`;
+}
+const MOVE_ART = {
+  getup: "moves/getup.jpg",
+  carry: "moves/carry.jpg",
+  overhead: "moves/overhead.jpg",
+  squat: "moves/squat.jpg",
+  crawl: "moves/crawl.jpg",
+  hinge: "moves/hinge.jpg",
+  plank: "moves/plank.jpg",
+  walk: "moves/walk.jpg"
+};
+function art(kind) {
+  const src = MOVE_ART[kind] || MOVE_ART.getup;
+  return `<img alt="" src="${src}">`;
+}
+
+const ARC = [
+  "Carry, learn the four",
+  "Carry, count the reps",
+  "Floor Strong",
+  "First retest",
+  "Yard games",
+  "Carry, heavier",
+  "Floor, cleaner stands",
+  "Midpoint retest",
+  "Yard, kid leads",
+  "Carry, longer hold",
+  "Floor plus walk",
+  "Readiness number"
+];
+function arcWeek() {
+  if (!db.started) db.started = Date.now();
+  const days = Math.floor((Date.now() - db.started) / 86400000);
+  return Math.min(12, Math.floor(days / 7) + 1);
+}
+function renderArc() {
+  const n = arcWeek();
+  const k = kid();
+  $("arcCard").innerHTML = `<div class="tiny">12-WEEK ARC · WEEK ${n}</div><h2>${ARC[n-1]}</h2>
+    <p class="note" style="margin-top:4px">With ${k.name}. Week 4 and week 8 are retests. Week 12 is the number you can show them.</p>
+    <div class="arc">${ARC.map((label, i) => `<i class="${i+1 < n ? "done" : i+1 === n ? "on" : ""}" title="${label}">${i+1}</i>`).join("")}</div>`;
+}
+function todayPlan() { return WEEK[new Date().getDay()]; }
+function renderWeek() {
+  const k = kid();
+  const t = todayPlan();
+  const names = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const line = t.id === "check"
+    ? "Sunday is the monthly retest, with " + k.name
+    : t.id
+      ? names[new Date().getDay()] + " is " + t.name + ", " + t.min + " minutes, with " + k.name
+      : names[new Date().getDay()] + " is a rest day with " + k.name;
+  $("weekCard").innerHTML = `<div class="tiny">THIS WEEK</div><h2>${line}</h2>
+    <div class="week">${WEEK.map((d, i) => `<button data-i="${i}" class="${i === new Date().getDay() ? "on" : ""}">${names[i]}<small>${d.min ? d.min + "m" : d.name}</small></button>`).join("")}</div>
+    <button class="btn" id="startToday" style="margin-top:10px">${t.id === "check" ? "Open retest" : t.id ? "Start today's session" : "Rest today · pick a circuit"}</button>`;
+  $("startToday").onclick = () => {
+    if (!t.id) { renderCircuits(); show("circuits"); return; }
+    if (t.id === "check") return startTest();
+    if (!premium() && t.id !== "carry") return openPay("Today's circuit is Premium. Free is Grandkid Carry.");
+    state.circuit = t.id;
+    state.min = premium() ? t.min : 10;
+    startSession();
+  };
+}
+const _renderHome = renderHome;
+renderHome = function () {
+  _renderHome();
+  renderWeek();
+  renderArc();
+  db.email = db.email || "";
+  db.remind = db.remind || "18:00";
+};
+function renderTest() {
+  const t = tests[state.i];
+  const f = TEST_FIELDS[state.i];
+  $("testTag").textContent = `Test ${state.i + 1} of 4`;
+  $("testName").textContent = t.name;
+  $("testBar").style.width = `${(state.i / 4) * 100}%`;
+  $("testCue").textContent = t.cue;
+  $("testStd").textContent = f.hint;
+  $("n1label").textContent = f.a.toUpperCase();
+  $("n2label").textContent = f.b.toUpperCase();
+  $("n1").value = state.nums ? state.nums[state.i][0] : "";
+  $("n2").value = state.nums ? state.nums[state.i][1] : "";
+  const ok = state.marks[state.i];
+  $("testChoice").innerHTML = `<p class="note" style="margin:0">Pass is scored from the numbers. ${ok === true ? "This one passes." : ok === false ? "Not yet." : "Enter both numbers."}</p>`;
+  $("testNext").textContent = state.i === 3 ? "Save checklist" : "Save and next";
+}
+function advanceTest() {
+  const f = TEST_FIELDS[state.i];
+  const a = Number($("n1").value);
+  const b = Number($("n2").value);
+  state.nums = state.nums || [[],[],[],[]];
+  state.nums[state.i] = [a, b];
+  state.marks[state.i] = f.pass(a, b);
+  if (state.i < 3) { state.i++; renderTest(); return; }
+  const before = earned();
+  const passed = state.marks.filter(Boolean).length;
+  db.checks.push({ kidId: state.kidId, marks: state.marks, nums: state.nums, when: stamp() });
+  save();
+  const fresh = !before.ready && passed === 4;
+  $("medal").textContent = passed === 4 ? "✓" : "–";
+  $("doneTitle").textContent = passed === 4 ? "Ready." : "Not yet.";
+  $("doneTag").textContent = fresh ? "Ready sticker" : passed + " of 4";
+  $("doneLede").textContent = passed === 4 ? "Numbers say you can still pick them up. Retest next month." : "The misses are the next month of work.";
+  $("doneCard").innerHTML = tests.map((t, i) => `<div class="check"><div class="sticker ${state.marks[i] ? t.sticker : "s-no"}">${state.marks[i] ? "✓" : "–"}</div><div><b>${t.name}</b><span>${state.nums[i][0]} / ${state.nums[i][1]}</span></div></div>`).join("");
+  show("done");
+}
+const _advance = advance;
+advance = function () {
+  const beforeLen = db.sessions.length;
+  _advance();
+  if (db.sessions.length === beforeLen || premium()) return;
+  $("doneCard").insertAdjacentHTML("beforeend", `<p class="note" style="margin-top:10px">Tomorrow's move is Floor Strong. That circuit, the longer sessions, and the numbered retest are Premium.</p><button class="btn" id="doneUpgrade" style="margin-top:8px">See annual</button>`);
+  const btn = $("doneUpgrade");
+  if (btn) btn.onclick = () => openPay("Tomorrow is waiting in Premium.");
+};
+$("editKid").onclick = () => {
+  const k = kid();
+  db.editing = k.id;
+  $("kidName").value = k.name;
+  $("kidAge").value = k.age;
+  show("add");
+};
+$("removeKid").onclick = () => {
+  if (db.kids.length < 2) return;
+  db.kids = db.kids.filter(k => k.id !== state.kidId);
+  state.kidId = db.kids[0].id;
+  save();
+  renderHome();
+};
+const _saveKid = $("saveKid").onclick;
+$("saveKid").onclick = () => {
+  const name = $("kidName").value.trim();
+  const age = Number($("kidAge").value);
+  if (!name || age < 6 || age > 18) return;
+  if (db.editing) {
+    const k = db.kids.find(item => item.id === db.editing);
+    if (k) { k.name = name; k.age = age; }
+    db.editing = null;
+    save();
+    $("kidName").value = "";
+    $("kidAge").value = "";
+    renderHome();
+    show("home");
+    return;
+  }
+  _saveKid();
+};
+$("accountBtn").onclick = () => {
+  $("acctEmail").value = db.email || "";
+  $("acctTime").value = db.remind || "18:00";
+  $("managePlan").textContent = premium() ? "Cancel to free" : "Upgrade";
+  show("account");
+};
+$("backAccount").onclick = () => show("home");
+$("saveAccount").onclick = () => {
+  db.email = $("acctEmail").value.trim();
+  db.remind = $("acctTime").value || "18:00";
+  save();
+  $("acctNote").textContent = "Saved for " + (db.email || "this phone") + ". Reminder set for " + db.remind + ".";
+};
+$("testRemind").onclick = async () => {
+  db.remind = $("acctTime").value || "18:00";
+  save();
+  if (!("Notification" in window)) { $("acctNote").textContent = "This browser cannot ping. The evening is still saved."; return; }
+  const perm = await Notification.requestPermission();
+  if (perm === "granted") new Notification("Father Fitness", { body: "Evening session. Still able to pick them up." });
+  $("acctNote").textContent = perm === "granted" ? "Test reminder sent. Repeats are saved for " + db.remind + "." : "Permission blocked. The evening is still saved.";
+};
+$("exportBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify(db)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "father-fitness-restore.json";
+  a.click();
+};
+$("importFile").onchange = () => {
+  const file = $("importFile").files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    db = JSON.parse(reader.result);
+    state.kidId = db.kids[0].id;
+    save();
+    renderHome();
+    show("home");
+  };
+  reader.readAsText(file);
+};
+$("managePlan").onclick = () => {
+  if (premium()) { db.plan = "free"; save(); renderHome(); show("home"); return; }
+  openPay("Unlock the full week.");
+};
+
+if (!db.onboarded) show("ob1");
+else { renderHome(); show("home"); }
+</script>
+</body>
+</html>
